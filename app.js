@@ -10,7 +10,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
     useFindAndModify: false
 });
 
-
 app.listen(PORT, () => {
   console.log("Express is running");
 })
