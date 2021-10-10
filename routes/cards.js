@@ -1,24 +1,9 @@
-/* const router = require('express').Router();
-const Card = require('../models/card');
+const router = require('express').Router();
 
-router.get('/cards', (req, res) => {
-  Card.find({})
-    .then((cards) => res.send({ data: cards }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
-});
+const { getCards, postCards, deleteCard } = require('../controllers/cards');
 
-router.post('/cards', (req, res) => {
-  const { name, link } = req.body;
+router.get('/cards', getCards);
+router.post('/cards', postCards);
+router.delete('/cards/:cardId', deleteCard);
 
-  Card.create({ name, link })
-    .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
-});
-
-router.delete('/cards/:cardId', (req, res) => {
-  Card.findByIdAndRemove(req.params.id)
-    .then((card) => res.send({ data: card }))
-    .catch((err) => res.status(500).send({ message: 'Произошла ошибка' }));
-});
-
-module.exports = router; */
+module.exports = router;

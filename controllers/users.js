@@ -3,13 +3,12 @@ const User = require('../models/user');
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => {
-      console.log(err);
-    });
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 const getUser = (req, res) => {
   const { userId } = req.params;
+
   User.findById(userId)
     .then((user) => {
       if (user) {
@@ -17,17 +16,13 @@ const getUser = (req, res) => {
       }
       return res.status();
     })
-    .catch((err) => {
-      console.log(err);
-    });
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 const createUser = (req, res) => {
   User.create({ ...req.body })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      console.log(err);
-    });
+    .then((user) => res.status(200).send({ data: user }))
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 module.exports = { getUsers, getUser, createUser };
