@@ -1,23 +1,23 @@
 const express = require('express');
-const routes = require('./routes');
-const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const usersRouter = require('./routes/users');
 
-const PORT = 3000;
+const { PORT = 3000 } = process.env;
 const app = express();
-
-app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
-  useCreateIndex: true,
-    useFindAndModify: false
 });
 
-app.use(routes);
-app.use('/cards', require('./routes/cards'));
-app.use('/users', require('./routes/users'));
+app.use((req, res, next) => {
+  req.user = {
+    _id: '616349f026923a945bb82236',
+  };
+  next();
+});
 
-app.listen(PORT, () => {
-  console.log("Express is running");
-})
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use('/', usersRouter);
+
+app.listen(PORT);

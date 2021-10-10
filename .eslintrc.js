@@ -1,18 +1,18 @@
-export default {
-  "env": {
-    "browser": true,
-    "es2021": true,
-    "node": true
+module.exports = {
+  env: {
+    browser: true,
+    es2021: true,
+    node: true,
   },
-  "extends": [
-    "airbnb-base",
-    "eslint:recommended"
+  extends: [
+    'airbnb-base',
+    'eslint:recommended',
   ],
-  "parserOptions": {
-    "ecmaVersion": 12,
-    //"sourceType": "module" - тогда module.exports = и без ""
+  parserOptions: {
+    ecmaVersion: 12,
+    sourceType: 'module',
   },
-  "rules": {
-    "no-underscore-dangle": ["error", { "allow": ["_id"] }]
-  }
+  rules: {
+    'no-underscore-dangle': ['error', { allow: ['_id'] }],
+  },
 };

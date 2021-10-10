@@ -1,12 +1,12 @@
 {
   "name": "express-mesto",
   "version": "1.0.0",
-  "description": "## Директории",
-  "main": "index.js",
+  "description": "backend on Node.js for Mesto project",
+  "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "lint": "npx eslint ."
+    "lint": "npx eslint"
   },
   "repository": {
     "type": "git",
