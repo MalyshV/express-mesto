@@ -5,15 +5,14 @@ const ERROR_CODE_400 = 400;
 const ERROR_CODE_404 = 404;
 const OK_CODE_200 = 200;
 
-module.exports.getUsers = (req, res) => {
+const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
     .catch(() => res.status(ERROR_CODE_500).send({ message: 'Ошибка сервера' }));
 };
 
-module.exports.getUser = (req, res) => {
+const getUser = (req, res) => {
   const { userId } = req.params;
-
   User.findById(userId)
     .then((user) => {
       if (user) {
@@ -29,18 +28,15 @@ module.exports.getUser = (req, res) => {
     });
 };
 
-module.exports.createUser = (req, res) => {
+const createUser = (req, res) => {
   User.create({ ...req.body })
-    .then((user) => res.status(OK_CODE_200).send({ data: user }))
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при создании пользователя' });
-      }
-      return res.status(ERROR_CODE_500).send({ message: 'Ошибка сервера' });
+      console.log(err);
     });
 };
 
-module.exports.updateProfile = (req, res) => {
+const updateProfile = (req, res) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
@@ -62,7 +58,7 @@ module.exports.updateProfile = (req, res) => {
     });
 };
 
-module.exports.updateAvatar = (req, res) => {
+const updateAvatar = (req, res) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(
@@ -82,4 +78,12 @@ module.exports.updateAvatar = (req, res) => {
       }
       return res.status(ERROR_CODE_500).send({ message: 'Ошибка сервера' });
     });
+};
+
+module.exports = {
+  getUsers,
+  getUser,
+  createUser,
+  updateProfile,
+  updateAvatar,
 };

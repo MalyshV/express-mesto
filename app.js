@@ -19,8 +19,8 @@ app.use((req, res, next) => {
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use('/users', usersRouter);
-app.use('/cards', cardsRouter);
+app.use('/', usersRouter);
+app.use('/', cardsRouter);
 
 app.listen(PORT, () => {
   console.log(`App listen ${PORT}`);
