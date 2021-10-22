@@ -1,4 +1,5 @@
 const User = require('../models/user');
+// const bcrypt = require('bcryptjs');
 
 const ERROR_CODE_500 = 500;
 const ERROR_CODE_400 = 400;
@@ -35,6 +36,16 @@ const createUser = (req, res) => {
       console.log(err);
     });
 };
+
+/* const createUser = (req, res) => {
+    bcrypt.hash(req.body.password, 10)
+      .then(hash => User.create({
+        email: req.body.email,
+        password: hash,
+      }))
+      .then((user) => res.send(user))
+      .catch((err) => res.status(400).send(err));
+  }; */
 
 const updateProfile = (req, res) => {
   const { name, about } = req.body;
