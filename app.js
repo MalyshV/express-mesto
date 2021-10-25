@@ -3,12 +3,12 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 const escape = require('escape-html');
 const rateLimit = require('express-rate-limit');
-const errors = require('celebrate');
+const { errors } = require('celebrate');
 
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const auth = require('./middlewares/auth');
-const NotAllowedError = require('./errors/not-found-err');
+// const NotAllowedError = require('./errors/not-found-err');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -33,8 +33,18 @@ app.use('/', usersRouter);
 app.use('/', cardsRouter);
 
 // eslint-disable-next-line no-unused-vars
-app.all('*', auth, (req) => {
+/* app.all('*', auth, (req) => {
   throw new NotAllowedError('Необходимо пройти авторизацию');
+}); */
+
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res.status(statusCode).send({
+    message: statusCode === 500
+      ? 'Произошла ошибка'
+      : message,
+  });
+  next();
 });
 
 escape('<script>alert("hacked")</script>');

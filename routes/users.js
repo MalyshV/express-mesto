@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const isUrl = require('validator/lib/isURL');
+const auth = require('../middlewares/auth');
 
 const {
   getUsers,
@@ -28,17 +29,17 @@ router.post('/signin', celebrate({
   }),
 }), login);
 
-router.get('/users', getUsers);
-router.get('/users/:userId', getUser);
+router.get('/users', auth, getUsers);
+router.get('/users/:userId', auth, getUser);
 
-router.patch('/users/me', celebrate({
+router.patch('/users/me', auth, celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     about: Joi.string().min(2).max(200).required(),
   }),
 }), updateProfile);
 
-router.patch('/users/me/avatar', celebrate({
+router.patch('/users/me/avatar', auth, celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().custom(isUrl).required(),
   }),

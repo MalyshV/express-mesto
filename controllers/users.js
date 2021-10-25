@@ -28,27 +28,33 @@ const createUser = (req, res, next) => {
     name, about, avatar, email, password,
   } = req.body;
 
-  bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
-    }))
-    .then((user) => res.send({
-      _id: user._id,
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-      email: user.email,
-    }))
+  User.findOne({ email })
+    .then((data) => {
+      if (data) {
+        throw new AlreadyExistError('Данный e-mail уже зарегистрирован');
+      }
+
+      bcrypt.hash(password, 10, (err, hash) => {
+        if (err) {
+          throw new ServerError('Произошла ошибка');
+        }
+
+        User.create({
+          name, about, avatar, email, password: hash,
+        })
+          .then((user) => {
+            res.send({
+              id: user._id,
+              email: user.email,
+            });
+          });
+      });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные при обновлении профиля'));
-      }
-      if (err.name === 'MongoError' && err.code === 11000) {
-        next(new AlreadyExistError('Данный e-mail уже зарегистрирован'));
+        next(new BadRequestError('Переданы некорректные данные при создании профиля'));
+      } else {
+        next(new ServerError('Ошибка сервера'));
       }
     });
 };
