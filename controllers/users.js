@@ -2,13 +2,15 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const ERROR_CODE_500 = 500;
-const ERROR_CODE_400 = 400;
-const ERROR_CODE_404 = 404;
+const ServerError = require('../errors/server-err'); // 500
+const BadRequestError = require('../errors/bad-request-err'); // 400
+const NotFoundError = require('../errors/not-found-err'); // 404
+const NotExistError = require('../errors/not-exist-err'); // 401
+const AlreadyExistError = require('../errors/already-exist-err'); // 409
+
 const OK_CODE_200 = 200;
 
-// войти на сайт
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.boby;
 
   return User.findUserByCredantials(email, password)
@@ -16,38 +18,12 @@ const login = (req, res) => {
       const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
       res.send({ token });
     })
-    .catch((err) => {
-      res.status(401).send({ message: err.message });
+    .catch(() => {
+      next(new NotExistError('Проверьте логин и пароль'));
     });
 };
 
-// получить список пользователей
-const getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.send({ data: users }))
-    .catch(() => res.status(ERROR_CODE_500).send({ message: 'Ошибка сервера' }));
-};
-
-// найти конкретного пользователя
-const getUser = (req, res) => {
-  const { userId } = req.params;
-  User.findById(userId)
-    .then((user) => {
-      if (user) {
-        return res.send({ data: user });
-      }
-      return res.status(ERROR_CODE_404).send({ message: 'Пользователь по указанному _id не найден' });
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные _id' });
-      }
-      return res.status(ERROR_CODE_500).send({ message: 'Ошибка сервера' });
-    });
-};
-
-// создать пользователя - добавить сюда все про пароль
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -68,12 +44,42 @@ const createUser = (req, res) => {
       email: user.email,
     }))
     .catch((err) => {
-      console.log(err);
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Переданы некорректные данные при обновлении профиля'));
+      }
+      if (err.name === 'MongoError' && err.code === 11000) {
+        next(new AlreadyExistError('Данный e-mail уже зарегистрирован'));
+      }
     });
 };
 
-// обновить данные профиля
-const updateProfile = (req, res) => {
+const getUsers = (req, res, next) => {
+  User.find({})
+    .then((users) => res.send({ data: users }))
+    .catch(() => {
+      next(new ServerError('Ошибка сервера'));
+    });
+};
+
+const getUser = (req, res, next) => {
+  const { userId } = req.params;
+  User.findById(userId)
+    .then((user) => {
+      if (user) {
+        return res.send({ data: user });
+      }
+      throw new NotFoundError('Пользователь по указанному _id не найден');
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Переданы некорректные данные _id'));
+      } else {
+        next(new ServerError('Ошибка сервера'));
+      }
+    });
+};
+
+const updateProfile = (req, res, next) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
@@ -85,18 +91,18 @@ const updateProfile = (req, res) => {
       if (user) {
         return res.status(OK_CODE_200).send({ data: user });
       }
-      return res.status(ERROR_CODE_404).send({ message: 'Пользователь с указанным _id не найден' });
+      throw new NotFoundError('Пользователь с указанным _id не найден');
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при обновлении профиля' });
+        next(BadRequestError('Переданы некорректные данные при обновлении профиля'));
+      } else {
+        next(new ServerError('Ошибка сервера'));
       }
-      return res.status(ERROR_CODE_500).send({ message: 'Ошибка сервера' });
     });
 };
 
-// обновить данные аватара
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(
@@ -108,13 +114,14 @@ const updateAvatar = (req, res) => {
       if (user) {
         return res.status(OK_CODE_200).send({ data: user });
       }
-      return res.status(ERROR_CODE_404).send({ message: 'Пользователь с указанным _id не найден' });
+      throw new NotFoundError('Пользователь с указанным _id не найден');
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при обновлении аватара' });
+        next(BadRequestError('Переданы некорректные данные при обновлении аватара'));
+      } else {
+        next(new ServerError('Ошибка сервера'));
       }
-      return res.status(ERROR_CODE_500).send({ message: 'Ошибка сервера' });
     });
 };
 
