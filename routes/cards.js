@@ -17,8 +17,8 @@ router.delete('/cards/:cardId/likes', dislikeCard);
 
 router.post('/cards', celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    link: Joi.string().custom(isUrl),
+    name: Joi.string().min(2).max(30).required(),
+    link: Joi.string().custom(isUrl).required(),
   }),
 }), postCard);
 

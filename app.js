@@ -10,20 +10,13 @@ const { createUser, login } = require('./controllers/users');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const auth = require('./middlewares/auth');
-const NotFoundError = require('./errors/not-found-err');
+const NotAllowedError = require('./errors/not-found-err');
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
-});
-
-app.use((req, res, next) => {
-  req.user = {
-    _id: '616349f026923a945bb82236',
-  };
-  next();
 });
 
 const limiter = rateLimit({
@@ -60,7 +53,7 @@ app.post('/signin', celebrate({
 
 // eslint-disable-next-line no-unused-vars
 app.all('*', auth, (req) => {
-  throw new NotFoundError('Запрашиваемый ресурс не найден');
+  throw new NotAllowedError('Необходимо пройти авторизацию');
 });
 
 escape('<script>alert("hacked")</script>');
