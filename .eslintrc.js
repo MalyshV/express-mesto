@@ -14,5 +14,7 @@ module.exports = {
   },
   rules: {
     'no-underscore-dangle': ['error', { allow: ['_id'] }],
+    'consistent-return': ['error', { treatUndefinedAsUnspecified: true }],
+    'arrow-body-style': ['error', 'as-needed'],
   },
 };
