@@ -1,14 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
-const escape = require('escape-html');
+// const escape = require('escape-html');
+const isUrl = require('validator/lib/isURL');
 const rateLimit = require('express-rate-limit');
-const { errors } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
 
+const { createUser, login } = require('./controllers/users');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const auth = require('./middlewares/auth');
-// const NotAllowedError = require('./errors/not-found-err');
+const NotFoundError = require('./errors/not-found-err');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -29,13 +31,30 @@ app.use(errors());
 app.use(limiter);
 app.use(auth);
 
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(6),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().custom(isUrl),
+  }),
+}), createUser);
+
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(6),
+  }),
+}), login);
+
 app.use('/', usersRouter);
 app.use('/', cardsRouter);
 
 // eslint-disable-next-line no-unused-vars
-/* app.all('*', auth, (req) => {
-  throw new NotAllowedError('Необходимо пройти авторизацию');
-}); */
+app.all('*', (req) => {
+  throw new NotFoundError('Запрашиваемый ресурс не найден');
+});
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
@@ -47,7 +66,7 @@ app.use((err, req, res, next) => {
   next();
 });
 
-escape('<script>alert("hacked")</script>');
+// escape('<script>alert("hacked")</script>');
 
 app.listen(PORT, () => {
   console.log(`App listen ${PORT}`);
