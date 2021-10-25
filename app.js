@@ -1,14 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
-const { celebrate, Joi, errors } = require('celebrate');
 const escape = require('escape-html');
 const rateLimit = require('express-rate-limit');
 const isUrl = require('validator/lib/isURL');
+const { celebrate, Joi, errors } = require('celebrate');
 
+const { createUser, login } = require('./controllers/users');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
-const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-err');
 
@@ -64,18 +64,6 @@ app.all('*', auth, (req) => {
 });
 
 escape('<script>alert("hacked")</script>');
-
-/* app.use((err, req, res, next) => { - или ошибку ServerError сюда!!!
-  const { statusCode = 500, message } = err;
-
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message
-    });
-}); */
 
 app.listen(PORT, () => {
   console.log(`App listen ${PORT}`);

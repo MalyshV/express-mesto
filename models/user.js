@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
       validator: (v) => isUrl(v),
-      message: 'Введите корректную сслыку',
+      message: 'Неправильный формат ссылки',
     },
   },
   email: {
@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-// не должна быть стрелочной, чтобы пользоваться this
+// showld not be arrow because of this
 // eslint-disable-next-line func-names
 userSchema.statics.findUserByCredantials = function (email, password) {
   return this.findOne({ email }).select('+password')
