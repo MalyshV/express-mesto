@@ -12,9 +12,23 @@ const {
 } = require('../controllers/cards');
 
 router.get('/cards', getCards);
-router.delete('/cards/:cardId', deleteCard);
-router.put('/cards/:cardId/likes', likeCard);
-router.delete('/cards/:cardId/likes', dislikeCard);
+router.delete('/cards/:cardId', celebrate({
+  body: Joi.object().keys({
+    cardId: Joi.string().length(24).hex(), // cardId????????
+  }),
+}), deleteCard);
+
+router.put('/cards/:cardId/likes', celebrate({
+  body: Joi.object().keys({
+    cardId: Joi.string().length(24).hex(), // cardId????????
+  }),
+}), likeCard);
+
+router.delete('/cards/:cardId/likes', celebrate({
+  body: Joi.object().keys({
+    cardId: Joi.string().length(24).hex(), // cardId????????
+  }),
+}), dislikeCard);
 
 router.post('/cards', celebrate({
   body: Joi.object().keys({

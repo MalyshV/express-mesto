@@ -27,14 +27,12 @@ const limiter = rateLimit({
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(helmet());
-app.use(errors());
 app.use(limiter);
-app.use(auth);
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(6),
+    password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
     avatar: Joi.string().custom(isUrl),
@@ -44,12 +42,14 @@ app.post('/signup', celebrate({
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(6),
+    password: Joi.string().required(),
   }),
 }), login);
 
+app.use(auth);
 app.use('/', usersRouter);
 app.use('/', cardsRouter);
+app.use(errors());
 
 // eslint-disable-next-line no-unused-vars
 app.all('*', (req) => {

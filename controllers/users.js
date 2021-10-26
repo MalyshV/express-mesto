@@ -11,7 +11,7 @@ const AlreadyExistError = require('../errors/already-exist-err'); // 409
 const OK_CODE_200 = 200;
 
 const login = (req, res, next) => {
-  const { email, password } = req.boby;
+  const { email, password } = req.body;
 
   return User.findUserByCredantials(email, password)
     .then((user) => {
@@ -47,7 +47,8 @@ const createUser = (req, res, next) => {
               id: user._id,
               email: user.email,
             });
-          });
+          })
+          .catch(next);
       });
     })
     .catch((err) => {

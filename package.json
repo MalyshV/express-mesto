@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "lint": "npx eslint"
+    "lint": "npx eslint ."
   },
   "repository": {
     "type": "git",
@@ -20,7 +20,9 @@
   "homepage": "https://github.com/MalyshV/express-mesto#readme",
   "devDependencies": {
     "eslint": "^7.32.0",
-    "nodemon": "^2.0.13"
+    "nodemon": "^2.0.13",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.24.2"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -28,8 +30,6 @@
     "celebrate": "^15.0.0",
     "cookie-parser": "^1.4.5",
     "escape-html": "^1.0.3",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.24.2",
     "express": "^4.17.1",
     "express-rate-limit": "^5.5.0",
     "helmet": "^4.6.0",
