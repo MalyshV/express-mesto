@@ -1,5 +1,4 @@
 const Card = require('../models/card');
-const ServerError = require('../errors/server-err'); // 500
 const BadRequestError = require('../errors/bad-request-err'); // 400
 const NotFoundError = require('../errors/not-found-err'); // 404
 const NotAllowedError = require('../errors/not-allowed-err'); // 403
@@ -9,8 +8,8 @@ const OK_CODE_200 = 200;
 const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(OK_CODE_200).send({ data: cards }))
-    .catch(() => {
-      next(new ServerError('Ошибка сервера'));
+    .catch((err) => {
+      next(err);
     });
 };
 
@@ -23,7 +22,7 @@ const postCard = (req, res, next) => {
       if (err.name === 'ValidationError') {
         throw new NotFoundError('Переданы некорректные данные при создании карточки');
       } else {
-        next(new ServerError('Ошибка сервера'));
+        next(err);
       }
     });
 };
@@ -50,7 +49,7 @@ const deleteCard = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные при удалении карточки'));
       } else {
-        next(new ServerError('Ошибка сервера'));
+        next(err);
       }
     });
 };
@@ -72,7 +71,7 @@ const likeCard = (req, res, next) => {
       if (err.message === 'NotValidId') {
         next(new NotFoundError('Передан несуществующий _id карточки'));
       } else {
-        next(new ServerError('Ошибка сервера'));
+        next(err);
       }
     });
 };
@@ -94,7 +93,7 @@ const dislikeCard = (req, res, next) => {
       if (err.message === 'NotValidId') {
         next(new NotFoundError('Передан несуществующий _id карточки'));
       } else {
-        next(new ServerError('Ошибка сервера'));
+        next(err);
       }
     });
 };

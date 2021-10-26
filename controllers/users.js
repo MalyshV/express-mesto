@@ -2,7 +2,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const ServerError = require('../errors/server-err'); // 500
 const BadRequestError = require('../errors/bad-request-err'); // 400
 const NotFoundError = require('../errors/not-found-err'); // 404
 const NotExistError = require('../errors/not-exist-err'); // 401
@@ -36,7 +35,7 @@ const createUser = (req, res, next) => {
 
       bcrypt.hash(password, 10, (err, hash) => {
         if (err) {
-          throw new ServerError('Произошла ошибка');
+          next(err); // - ??????????????????????????
         }
 
         User.create({
@@ -55,7 +54,7 @@ const createUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при создании профиля'));
       } else {
-        next(new ServerError('Ошибка сервера'));
+        next(err);
       }
     });
 };
@@ -63,8 +62,8 @@ const createUser = (req, res, next) => {
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => {
-      next(new ServerError('Ошибка сервера'));
+    .catch((err) => {
+      next(err);
     });
 };
 
@@ -81,7 +80,7 @@ const getUser = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные _id'));
       } else {
-        next(new ServerError('Ошибка сервера'));
+        next(err);
       }
     });
 };
@@ -104,7 +103,7 @@ const updateProfile = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(BadRequestError('Переданы некорректные данные при обновлении профиля'));
       } else {
-        next(new ServerError('Ошибка сервера'));
+        next(err);
       }
     });
 };
@@ -127,7 +126,7 @@ const updateAvatar = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(BadRequestError('Переданы некорректные данные при обновлении аватара'));
       } else {
-        next(new ServerError('Ошибка сервера'));
+        next(err);
       }
     });
 };
