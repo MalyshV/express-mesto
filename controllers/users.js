@@ -14,8 +14,13 @@ const login = (req, res, next) => {
 
   return User.findUserByCredantials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       res.send({ token });
+      res.cookie('jwt', token, {
+        maxAge: 3600000 * 24 * 7,
+        httpOnly: true,
+        sameSite: true,
+      });
     })
     .catch(() => {
       next(new NotExistError('Проверьте логин и пароль'));
@@ -35,7 +40,7 @@ const createUser = (req, res, next) => {
 
       bcrypt.hash(password, 10, (err, hash) => {
         if (err) {
-          next(err); // - ??????????????????????????
+          throw new Error('Ошибка сервера');
         }
 
         User.create({
@@ -82,6 +87,24 @@ const getUser = (req, res, next) => {
       } else {
         next(err);
       }
+    });
+};
+
+const getCurrentUser = (req, res, next) => {
+  const userId = req.user._id;
+
+  return User.findById(userId)
+    .then((user) => {
+      if (user) {
+        res.send(user);
+      }
+      throw new NotFoundError('Пользователь по указанному _id не найден');
+    })
+    .catch((err) => {
+      if (err.name === 'Cast Error') {
+        next(new BadRequestError('Переданы некорректные данные _id'));
+      }
+      next(err);
     });
 };
 
@@ -138,4 +161,5 @@ module.exports = {
   updateProfile,
   updateAvatar,
   login,
+  getCurrentUser,
 };

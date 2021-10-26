@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-const isUrl = require('validator/lib/isURL');
+const validateURL = require('../middlewares/validation');
 // const auth = require('../middlewares/auth');
 
 const {
@@ -8,12 +8,14 @@ const {
   getUser,
   updateProfile,
   updateAvatar,
+  getCurrentUser,
 } = require('../controllers/users');
 
 router.get('/users', getUsers);
+router.get('/users/me', getCurrentUser);
 router.get('/users/:userId', celebrate({
   body: Joi.object().keys({
-    userId: Joi.string().length(24).hex(), // userId????????
+    userId: Joi.string().length(24).hex(),
   }),
 }), getUser);
 
@@ -26,7 +28,7 @@ router.patch('/users/me', celebrate({
 
 router.patch('/users/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().custom(isUrl).required(),
+    avatar: Joi.string().custom(validateURL).required(),
   }),
 }), updateAvatar);
 
