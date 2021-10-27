@@ -13,19 +13,19 @@ const {
 
 router.get('/cards', getCards);
 router.delete('/cards/:cardId', celebrate({
-  body: Joi.object().keys({
+  params: Joi.object().keys({
     cardId: Joi.string().length(24).hex(),
   }),
 }), deleteCard);
 
 router.put('/cards/:cardId/likes', celebrate({
-  body: Joi.object().keys({
+  params: Joi.object().keys({
     cardId: Joi.string().length(24).hex(),
   }),
 }), likeCard);
 
 router.delete('/cards/:cardId/likes', celebrate({
-  body: Joi.object().keys({
+  params: Joi.object().keys({
     cardId: Joi.string().length(24).hex(),
   }),
 }), dislikeCard);

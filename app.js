@@ -54,7 +54,7 @@ app.use('/', cardsRouter);
 app.use(errors());
 
 // eslint-disable-next-line no-unused-vars
-app.all('*', auth, (req) => {
+app.all('*', (req) => {
   throw new NotFoundError('Запрашиваемый ресурс не найден');
 });
 
