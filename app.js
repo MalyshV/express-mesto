@@ -5,6 +5,7 @@ const escape = require('escape-html');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const { celebrate, Joi, errors } = require('celebrate');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { createUser, login } = require('./controllers/users');
 const validateURL = require('./middlewares/validation');
@@ -30,6 +31,13 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(helmet());
 app.use(limiter);
+app.use(requestLogger); // подключаем логгер запросов
+
+app.get('/crash-test', () => { // краш-тест для ревью
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
@@ -51,6 +59,7 @@ app.post('/signin', celebrate({
 app.use(auth);
 app.use('/', usersRouter);
 app.use('/', cardsRouter);
+app.use(errorLogger); // подключаем логгер ошибок
 app.use(errors());
 
 // eslint-disable-next-line no-unused-vars
